@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import fr.open.pam.velov.model.JCDecauxStation;
 import org.glassfish.jersey.client.ClientConfig;
+import jersey.repackaged.com.google.common.base.Function;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -61,10 +62,11 @@ public class JCDecauxClient {
                 .request().accept(MediaType.APPLICATION_JSON)
                 .get(String.class);
 
-        ObjectMapper mapper = new ObjectMapper();
+
 
         List<JCDecauxStation> listeStations =  null;
         try {
+            ObjectMapper mapper = new ObjectMapper();
             listeStations = mapper.readValue(response, TypeFactory.defaultInstance().constructCollectionType(List.class, JCDecauxStation.class));
         } catch (IOException e) {
             LOGGER.warning(e.getMessage());
