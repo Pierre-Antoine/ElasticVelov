@@ -1,21 +1,16 @@
 package fr.open.pam.velov.api;
 
-import fr.open.pam.velov.elastic.entities.Station;
 import fr.open.pam.velov.model.JCDecauxStation;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ElasticsearchClient;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
-import org.elasticsearch.repositories.Repository;
 import org.junit.Test;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
 
 /**
@@ -27,18 +22,27 @@ public class JCDecauxClientTest {
     public void testCall() throws IOException {
         JCDecauxClient client = new JCDecauxClient("553697ac71debb821e9cde132cd668471dd2546f");
         List<JCDecauxStation> liste = client.getAllStations();
-        System.out.println(liste.size());
+        //System.out.println(liste.size());
 
-        Settings settings = ImmutableSettings.settingsBuilder()
+
+        //TODO: put this in another test class
+        Settings settings = Settings.settingsBuilder()
                 .put("client.transport.sniff", "true")
                 .put("cluster.name", "elasticsearch")
+                .put("node.name","Thin Man")
                 .build();
 
-        Client elasticClient = new TransportClient(settings)
-                .addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+        Client elasticClient = TransportClient.builder()
+                .settings(settings)
+                .build()
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300))
+                ;
 
         ElasticsearchTemplate template = new ElasticsearchTemplate(elasticClient);
 
+        template.createIndex("bernardo");
+
+        elasticClient.close();
     }
 
 
