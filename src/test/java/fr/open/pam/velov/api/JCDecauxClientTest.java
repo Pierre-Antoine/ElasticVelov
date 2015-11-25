@@ -1,16 +1,15 @@
 package fr.open.pam.velov.api;
 
 import fr.open.pam.velov.model.JCDecauxStation;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.junit.Test;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ public class JCDecauxClientTest {
         Settings settings = Settings.settingsBuilder()
                 .put("client.transport.sniff", "true")
                 .put("cluster.name", "elasticsearch")
-                .put("node.name","Thin Man")
+                .put("node.name","White Tiger")
                 .build();
 
         Client elasticClient = TransportClient.builder()
@@ -37,12 +36,6 @@ public class JCDecauxClientTest {
                 .build()
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300))
                 ;
-
-        ElasticsearchTemplate template = new ElasticsearchTemplate(elasticClient);
-
-        template.createIndex("bernardo");
-
-        elasticClient.close();
     }
 
 
