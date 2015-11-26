@@ -62,7 +62,7 @@ public class JCDecauxClient {
                 .request().accept(MediaType.APPLICATION_JSON)
                 .get(String.class);
 
-
+        response = response.replace("lng","lon");
 
         List<JCDecauxStation> listeStations =  null;
         try {
@@ -71,6 +71,9 @@ public class JCDecauxClient {
         } catch (IOException e) {
             LOGGER.warning(e.getMessage());
         }
+
+        LOGGER.info(String.format("%s documents ont été récupérés",String.valueOf(listeStations.size())));
+
         return listeStations;
     }
 }

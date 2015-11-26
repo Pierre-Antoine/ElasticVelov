@@ -1,32 +1,29 @@
 package fr.open.pam.velov.elastic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
-import org.springframework.classify.Classifier;
-import org.springframework.classify.ClassifierSupport;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.logging.Logger;
 
-import static org.elasticsearch.client.Requests.indexRequest;
 
 /**
  * @author @obazoud (Olivier Bazoud)
  */
-public class ElasticItemWriter<T> implements ItemWriter<T>, InitializingBean {
+
+//TODO: cleanup!
+public class ElasticItemWriter<T> implements InitializingBean {
+
+    private final Logger LOGGER = Logger.getLogger(ElasticItemWriter.class.getName());
+
     private Client client;
     private String indexName;
+
     private String typeName;
-    private Classifier<T, String> idClassifier;
-    private Classifier<T, String> typeNameClassifier;
-    private Classifier<T, String> indexNameClassifier;
-    private Classifier<T, ActionRequest> actionRequestClassifier;
     private ObjectMapper mapper;
     private long timeoutMillis;
 
@@ -34,27 +31,15 @@ public class ElasticItemWriter<T> implements ItemWriter<T>, InitializingBean {
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(client, "client must not be null");
         Assert.notNull(mapper, "mapper must not be null");
-        if (typeName == null) {
-            typeNameClassifier = new ClassifierSupport<T, String>(typeName);
-        }
-        if (indexNameClassifier == null) {
-            indexNameClassifier = new ClassifierSupport<T, String>(indexName);
-        }
-        if (actionRequestClassifier == null) {
-            // TODO: improve this!
-            actionRequestClassifier = new ClassifierSupport<T, ActionRequest>(new IndexRequest(indexName));
-        }
-        if (idClassifier == null) {
-            idClassifier = new ClassifierSupport<T, String>(null);
-        }
+        Assert.notNull(indexName, "index name must not be null");
+        Assert.notNull(typeName, "type must not be null");
     }
 
-    @Override
     public void write(List<? extends T> items) throws Exception {
         BulkRequestBuilder bulk = client.prepareBulk();
 
         for(T item: items) {
-            bulk.add(client.prepareIndex(indexName,"station")
+            bulk.add(client.prepareIndex(indexName,typeName)
                             .setSource(transform(item)));
         }
 
@@ -62,78 +47,29 @@ public class ElasticItemWriter<T> implements ItemWriter<T>, InitializingBean {
         if (response.hasFailures()) {
             throw new RuntimeException(response.buildFailureMessage());
         }
+
+        LOGGER.info("Fermeture de la connexion à ES.");
+        client.close();
     }
 
     protected String transform(T item) throws Exception {
         return mapper.writeValueAsString(item);
     }
 
-    public Client getClient() {
-        return client;
-    }
-
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public String getIndexName() {
-        return indexName;
     }
 
     public void setIndexName(String indexName) {
         this.indexName = indexName;
     }
 
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public Classifier<T, String> getIdClassifier() {
-        return idClassifier;
-    }
-
-    public void setIdClassifier(Classifier<T, String> idClassifier) {
-        this.idClassifier = idClassifier;
-    }
-
-    public Classifier<T, String> getTypeNameClassifier() {
-        return typeNameClassifier;
-    }
-
-    public void setTypeNameClassifier(Classifier<T, String> typeNameClassifier) {
-        this.typeNameClassifier = typeNameClassifier;
-    }
-
-    public Classifier<T, String> getIndexNameClassifier() {
-        return indexNameClassifier;
-    }
-
-    public void setIndexNameClassifier(Classifier<T, String> indexNameClassifier) {
-        this.indexNameClassifier = indexNameClassifier;
-    }
-
-    public Classifier<T, ActionRequest> getActionRequestClassifier() {
-        return actionRequestClassifier;
-    }
-
-    public void setActionRequestClassifier(Classifier<T, ActionRequest> actionRequestClassifier) {
-        this.actionRequestClassifier = actionRequestClassifier;
-    }
-
-    public ObjectMapper getMapper() {
-        return mapper;
-    }
-
     public void setMapper(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 
-    public long getTimeoutMillis() {
-        return timeoutMillis;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     public void setTimeoutMillis(long timeoutMillis) {

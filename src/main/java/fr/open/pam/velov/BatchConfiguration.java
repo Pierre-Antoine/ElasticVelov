@@ -54,12 +54,10 @@ public class BatchConfiguration {
     @Value("${elastic.node.port}")
     private int nodePort;
 
-    @Bean
     public JCDecauxClient client(){
         return new JCDecauxClient(apiKey);
     }
 
-    @Bean(name = "elasticClient")
     public Client elasticClient() {
         LOGGER.info("Instantiation du client ES");
         Settings settings = Settings.settingsBuilder()

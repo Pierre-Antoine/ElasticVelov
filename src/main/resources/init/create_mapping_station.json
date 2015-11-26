@@ -1,0 +1,21 @@
+{
+  "mappings" : {
+    "station" : {
+      "properties" : {
+        "number" : {"type" : "string", "index" : "not_analyzed"},
+        "contract_name" : {"type" : "string", "index" : "not_analyzed" },
+        "name" : {"type" : "string", "index" : "not_analyzed" },
+        "address" : {"type" : "string", "index" : "not_analyzed"},
+        "position" : {"type" : "geo_point" },
+        "banking" : {"type" : "string", "index" : "not_analyzed"},
+        "bonus" : {"type" : "string", "index" : "not_analyzed"},
+        "status" : {"type" : "string", "index" : "not_analyzed" },
+        "bike_stands" : {"type" : "integer"},
+        "available_bike_stands" : {"type" : "integer"},
+        "available_bikes" : {"type" : "integer"},
+        "last_update" : {"type" : "date"},
+        "_timestamp" : {"enabled" : "true"}
+      }
+    }
+  }
+}

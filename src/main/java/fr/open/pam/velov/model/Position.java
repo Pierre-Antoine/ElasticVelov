@@ -6,7 +6,7 @@ package fr.open.pam.velov.model;
 public class Position {
 
     private double lat;
-    private double lng;
+    private double lon;
 
     public double getLat() {
         return lat;
@@ -16,11 +16,11 @@ public class Position {
         this.lat = lat;
     }
 
-    public double getLng() {
-        return lng;
+    public double getLon() {
+        return lon;
     }
 
-    public void setLng(double lng) {
-        this.lng = lng;
+    public void setLon(double lon) {
+        this.lon = lon;
     }
 }
